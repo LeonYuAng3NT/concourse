@@ -1,7 +1,3 @@
-[submodule "src/github.com/bmizerany/pat"]
-	path = src/github.com/bmizerany/pat
-	url = https://github.com/bmizerany/pat
-	branch = master
 [submodule "src/github.com/concourse/atc"]
 	path = src/github.com/concourse/atc
 	url = https://github.com/concourse/atc
@@ -112,6 +108,7 @@
 [submodule "src/github.com/tedsuo/rata"]
 	path = src/github.com/tedsuo/rata
 	url = https://github.com/tedsuo/rata
+	branch = master
 [submodule "src/github.com/tedsuo/ifrit"]
 	path = src/github.com/tedsuo/ifrit
 	url = https://github.com/tedsuo/ifrit
@@ -125,6 +122,7 @@
 [submodule "src/github.com/vito/gosub"]
 	path = src/github.com/vito/gosub
 	url = https://github.com/vito/gosub
+	branch = master
 [submodule "src/github.com/jessevdk/go-flags"]
 	path = src/github.com/jessevdk/go-flags
 	url = https://github.com/jessevdk/go-flags
@@ -191,6 +189,7 @@
 [submodule "src/gopkg.in/cheggaaa/pb.v1"]
 	path = src/gopkg.in/cheggaaa/pb.v1
 	url = https://gopkg.in/cheggaaa/pb.v1
+	branch = master
 [submodule "src/code.cloudfoundry.org/clock"]
 	path = src/code.cloudfoundry.org/clock
 	url = https://github.com/cloudfoundry/clock
@@ -243,10 +242,6 @@
 	path = src/github.com/concourse/topgun
 	url = https://github.com/concourse/topgun
 	branch = master
-[submodule "src/github.com/concourse/groundcrew"]
-	path = src/github.com/concourse/groundcrew
-	url = https://github.com/concourse/groundcrew
-	branch = master
 [submodule "src/github.com/The-Cloud-Source/goryman"]
 	path = src/github.com/The-Cloud-Source/goryman
 	url = https://github.com/The-Cloud-Source/goryman
@@ -279,13 +274,156 @@
 	path = src/github.com/miekg/dns
 	url = https://github.com/miekg/dns
 	branch = master
-[submodule "src/golang.org/x/sync"]
-	path = src/golang.org/x/sync
-	url = https://go.googlesource.com/sync
 [submodule "src/github.com/cloudfoundry/bosh-cli"]
 	path = src/github.com/cloudfoundry/bosh-cli
 	url = https://github.com/cloudfoundry/bosh-cli
 [submodule "src/github.com/hashicorp/vault"]
 	path = src/github.com/hashicorp/vault
 	url = https://github.com/hashicorp/vault
+	branch = master
+[submodule "src/github.com/krishicks/yaml-patch"]
+	path = src/github.com/krishicks/yaml-patch
+	url = https://github.com/krishicks/yaml-patch
+	branch = master
+[submodule "src/github.com/google/jsonapi"]
+	path = src/github.com/google/jsonapi
+	url = https://github.com/google/jsonapi
+	branch = master
+[submodule "src/github.com/cloudfoundry-incubator/credhub-cli"]
+	path = src/github.com/cloudfoundry-incubator/credhub-cli
+	url = https://github.com/cloudfoundry-incubator/credhub-cli
+	branch = master
+[submodule "src/github.com/bmizerany/pat"]
+	path = src/github.com/bmizerany/pat
+	url = https://github.com/bmizerany/pat
+[submodule "src/github.com/influxdata/influxdb"]
+	path = src/github.com/influxdata/influxdb
+	url = https://github.com/influxdata/influxdb
+	branch = master
+[submodule "src/github.com/prometheus/client_model"]
+	path = src/github.com/prometheus/client_model
+	url = https://github.com/prometheus/client_model
+	branch = master
+[submodule "src/github.com/beorn7/perks"]
+	path = src/github.com/beorn7/perks
+	url = https://github.com/beorn7/perks
+	branch = master
+[submodule "src/github.com/prometheus/common"]
+	path = src/github.com/prometheus/common
+	url = https://github.com/prometheus/common
+	branch = master
+[submodule "src/github.com/prometheus/procfs"]
+	path = src/github.com/prometheus/procfs
+	url = https://github.com/prometheus/procfs
+	branch = master
+[submodule "src/github.com/matttproud/golang_protobuf_extensions"]
+	path = src/github.com/matttproud/golang_protobuf_extensions
+	url = https://github.com/matttproud/golang_protobuf_extensions
+	branch = master
+[submodule "src/github.com/prometheus/client_golang"]
+	path = src/github.com/prometheus/client_golang
+	url = https://github.com/prometheus/client_golang
+	branch = master
+[submodule "src/github.com/dghubble/oauth1"]
+	path = src/github.com/dghubble/oauth1
+	url = https://github.com/dghubble/oauth1
+	branch = master
+[submodule "src/github.com/SHyx0rmZ/go-bitbucket"]
+	path = src/github.com/SHyx0rmZ/go-bitbucket
+	url = https://github.com/SHyx0rmZ/go-bitbucket
+	branch = master
+[submodule "src/github.com/mattes/migrate"]
+	path = src/github.com/mattes/migrate
+	url = https://github.com/mattes/migrate
+[submodule "src/github.com/NYTimes/gziphandler"]
+	path = src/github.com/NYTimes/gziphandler
+	url = https://github.com/NYTimes/gziphandler
+	branch = master
+[submodule "src/github.com/go-openapi/jsonpointer"]
+	path = src/github.com/go-openapi/jsonpointer
+	url = https://github.com/go-openapi/jsonpointer
+	branch = master
+[submodule "src/golang.org/x/text"]
+	path = src/golang.org/x/text
+	url = https://go.googlesource.com/text
+	branch = master
+[submodule "src/github.com/emicklei/go-restful"]
+	path = src/github.com/emicklei/go-restful
+	url = https://github.com/emicklei/go-restful
+	branch = master
+[submodule "src/github.com/go-openapi/jsonreference"]
+	path = src/github.com/go-openapi/jsonreference
+	url = https://github.com/go-openapi/jsonreference
+	branch = master
+[submodule "src/github.com/golang/glog"]
+	path = src/github.com/golang/glog
+	url = https://github.com/golang/glog
+	branch = master
+[submodule "src/github.com/google/gofuzz"]
+	path = src/github.com/google/gofuzz
+	url = https://github.com/google/gofuzz
+	branch = master
+[submodule "src/github.com/PuerkitoBio/purell"]
+	path = src/github.com/PuerkitoBio/purell
+	url = https://github.com/PuerkitoBio/purell
+	branch = master
+[submodule "src/k8s.io/kube-openapi"]
+	path = src/k8s.io/kube-openapi
+	url = https://github.com/kubernetes/kube-openapi
+	branch = master
+[submodule "src/github.com/PuerkitoBio/urlesc"]
+	path = src/github.com/PuerkitoBio/urlesc
+	url = https://github.com/PuerkitoBio/urlesc
+	branch = master
+[submodule "src/k8s.io/client-go"]
+	path = src/k8s.io/client-go
+	url = https://github.com/kubernetes/client-go
+	branch = master
+[submodule "src/k8s.io/apimachinery"]
+	path = src/k8s.io/apimachinery
+	url = https://github.com/kubernetes/apimachinery
+	branch = master
+[submodule "src/k8s.io/api"]
+	path = src/k8s.io/api
+	url = https://github.com/kubernetes/api
+	branch = master
+[submodule "src/github.com/mailru/easyjson"]
+	path = src/github.com/mailru/easyjson
+	url = https://github.com/mailru/easyjson
+	branch = master
+[submodule "src/github.com/go-openapi/spec"]
+	path = src/github.com/go-openapi/spec
+	url = https://github.com/go-openapi/spec
+	branch = master
+[submodule "src/github.com/go-openapi/swag"]
+	path = src/github.com/go-openapi/swag
+	url = https://github.com/go-openapi/swag
+	branch = master
+[submodule "src/github.com/aws/aws-sdk-go"]
+	path = src/github.com/aws/aws-sdk-go
+	url = https://github.com/aws/aws-sdk-go
+	branch = master
+[submodule "src/github.com/concourse/skymarshal"]
+	path = src/github.com/concourse/skymarshal
+	url = https://github.com/concourse/skymarshal
+	branch = master
+[submodule "src/github.com/concourse/web"]
+	path = src/github.com/concourse/web
+	url = https://github.com/concourse/web
+	branch = master
+[submodule "src/github.com/concourse/worker"]
+	path = src/github.com/concourse/worker
+	url = https://github.com/concourse/worker
+	branch = master
+[submodule "src/github.com/concourse/flag"]
+	path = src/github.com/concourse/flag
+	url = https://github.com/concourse/flag
+	branch = master
+[submodule "src/golang.org/x/sys"]
+	path = src/golang.org/x/sys
+	url = https://go.googlesource.com/sys
+	branch = master
+[submodule "src/github.com/mattn/go-runewidth"]
+	path = src/github.com/mattn/go-runewidth
+	url = https://github.com/mattn/go-runewidth
 	branch = master

@@ -16,16 +16,23 @@ templates:
   vault_ca_cert.erb: config/vault_ca_cert
   vault_client_cert.erb: config/vault_client_cert
   vault_client_key.erb: config/vault_client_key
+  credhub_ca_cert.erb: config/credhub_ca_cert
+  credhub_client_cert.erb: config/credhub_client_cert
+  credhub_client_key.erb: config/credhub_client_key
+  token_signing_key.erb: config/token_signing_key
+  downgrade_db.erb: bin/experimental_downgrade_db
 
 packages:
   - pid_utils
   - atc
   - fly
-  - generated_signing_key
 
 consumes:
 - name: db
   type: postgresql
+  optional: true
+- name: postgres
+  type: database
   optional: true
 
 provides:
@@ -71,7 +78,7 @@ properties:
 
       Typically this is the URL that you as a user would use to reach your CI.
       For multiple ATCs it would go to some sort of load balancer.
-    example: https://ci.concourse.ci
+    example: https://ci.concourse-ci.org
 
   peer_url:
     description: |
@@ -257,6 +264,10 @@ properties:
     description: Name of the authentication method to be displayed on the Web UI
     default: ""
 
+  intercept_idle_timeout:
+    description: Length of time for a intercepted session to be idle before terminating, in Go duration format.
+    example: 5m
+
   default_check_interval:
     description: |
       The interval, in Go duration format (1m = 1 minute), on which to check
@@ -284,11 +295,18 @@ properties:
       for and release old caches of resource versions.
     default: 30s
 
-  old_resource_grace_period:
+  container_placement_strategy:
     description: |
-      How long to cache the result of a get step after a newer version of the
-      resource is found. Use Go duration format (1m = 1 minute).
-    default: 5m
+      Method by which a worker is selected during container placement.
+
+      Options are "volume-locality" and "random".
+    default: "volume-locality"
+
+  baggageclaim_response_header_timeout:
+    description: |
+      How long to wait for Baggageclaim to send the response header. Use Go duration
+      format (1m = 1 minute).
+    default: 1m
 
   postgresql_database:
     description: |
@@ -347,6 +365,20 @@ properties:
       Dialing timeout, in Go duration format (1m = 1 minute). 0 means wait indefinitely.
     default: 5m
 
+  token_signing_key:
+    type: rsa
+    description: |
+      PEM RSA private key used for minting ATC tokens.
+    example:
+      private_key: |
+         -----BEGIN RSA PRIVATE KEY-----
+         ...
+         -----END RSA PRIVATE KEY-----
+      public_key: |
+         -----BEGIN PUBLIC KEY-----
+         ...
+         -----END PUBLIC KEY-----
+
   yeller.api_key:
     description: |
       If configured, errors emitted to the logs will also be emitted to Yeller.
@@ -381,6 +413,14 @@ properties:
     example:
       env: dev
       foo: bar
+
+  prometheus.bind_ip:
+    description: |
+      If configured, expose Prometheus metrics at specified address
+
+  prometheus.bind_port:
+    description: |
+      If configured, expose Prometheus metrics at specified port
 
   influxdb.url:
     description: |
@@ -439,3 +479,54 @@ properties:
       Key-value parameters to provide when logging in with the backend.
     default: {}
     example: {role_id: abc123, secret_id: def456}
+
+  credhub.url:
+    description: |
+      CredHub server address used to access secrets.
+    example: "https://credhub-server:9000"
+  credhub.path_prefix:
+    description: |
+      Path under which to namespace team/pipeline credentials.
+    default: /concourse
+  credhub.tls.ca_cert:
+    type: certificate
+    description: |
+      A PEM-encoded CA cert to use to verify the Credhub server SSL cert.
+  credhub.tls.client_cert:
+    type: certificate
+    description: |
+      Client certificate for CredHub mutual TLS auth.
+  credhub.tls.insecure_skip_verify:
+    description: |
+      Enable insecure SSL verification.
+    default: false
+  credhub.client_id:
+    description: |
+      Client ID for CredHub authorization.
+  credhub.client_secret:
+    description: |
+      Client secret for CredHub authorization.
+
+  aws_ssm.region:
+    description: |
+      AWS region to use for fetching SSM parameters.
+  aws_ssm.access_key:
+    description: |
+      AWS Access key ID used as credentials for accessing SSM parameters.
+  aws_ssm.secret_key:
+    description: |
+      AWS Secret Access Key used as credentials for accessing SSM parameters.
+  aws_ssm.session_token:
+    description: |
+      AWS Session Token used as credentials for accessing SSM parameters.
+  aws_ssm.pipeline_secret_template:
+    description: |
+      AWS SSM parameter name template used to resolve pipeline specific secrets. If this flag contains slashes, be sure
+      to start it with a /. Maximum 5 slashes are permitted by AWS in parameter names.
+    default: /concourse/{{.Team}}/{{.Pipeline}}/{{.Secret}}
+  aws_ssm.team_secret_template:
+    description: |
+      AWS SSM parameter name template used to resolve team specific secrets. If this flag contains slashes, be sure
+      to start it with a /. Maximum 5 slashes are permitted by AWS in parameter names.
+      names.
+    default: /concourse/{{.Team}}/{{.Secret}}

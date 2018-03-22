@@ -1,7 +1,7 @@
 # Improving Concourse
 
 So, you've come here hoping to make Concourse better? Rad. There are lots of
-ways to do this, from just hanging around [Slack](https://slack.concourse.ci)
+ways to do this, from just hanging around [Slack](http://slack.concourse-ci.org)
 to contributing to discussions in GitHub issues and, maybe at some point,
 contributing code.
 
@@ -36,7 +36,7 @@ There are a few ways you can help out here:
   The same rules apply for GitHub reactions and comments; they help us decide
   which things are affecting more people.
 
-* Helping other folks out in [Slack](https://slack.concourse.ci) and [Stack
+* Helping other folks out in [Slack](http://slack.concourse-ci.org) and [Stack
   Overflow](http://stackoverflow.com/questions/tagged/concourse) really helps
   grow the community. We try to help out through the day but relying on one
   timezone doesn't scale.
@@ -84,6 +84,22 @@ the project!
 
 # Development
 
+## Initial Setup
+
+```
+git clone https://github.com/concourse/concourse
+cd concourse
+git submodule update --init --recursive
+
+# if not using direnv
+source .envrc
+
+# if needing to use fly against a local build
+cd src/github.com/concourse/fly
+go build
+# now use the 'fly' in this folder
+```
+
 ## Running Concourse locally
 
 There are scripts under `dev/` to make running Concourse during development
@@ -115,11 +131,21 @@ that one separately:
 Then you can just `Ctrl+C` the `./dev/atc` process and restart it as you make
 changes.
 
-To start everything needed for a full Testflight run, run `./dev/full-start`.
-The only difference is two additional workers: one with a tag, and another with
-a proxiy configured. If your changes don't seem like they'd need those workers,
-you can stick with `./dev/start` - the tests will automatically skip themselves
-if the workers are not present.
+If you prefer to start the postgres database in a container, replace `db` with
+`dockerdb` and `atc` with `atc-dockerdb` in `./dev/Procfile`. The `db` Docker
+container will persist across `./dev/start` runs. To stop it and perform
+cleanup use:
+
+  `docker stop <container ID>`.
+
+### Troubleshooting `dev/worker`
+If your `worker` fails to start on macOS with the error
+```
+docker: Error response from daemon: Mounts denied: EOF
+```
+a fix is to open your Docker preferences, go to the "File Sharing" tab
+and add the directory `/private` to the list
+(Click `+` then Cmd + Shift + G to get a "Go to folder" prompt).
 
 
 ## Making changes to Concourse
@@ -148,6 +174,21 @@ to synchronize with multiple PRs in flight. We'll take it from there. If your
 changes involve multiple components, though (`atc` and `fly` for example), be
 sure to let us know in each PR.
 
+When adding / modifying methods to the ATC API, you may need to regenerate
+models and data structures used for testing using Counterfeiter. To do so,
+download and install counterfeiter:
+
+```bash
+go get github.com/maxbrunsfeld/counterfeiter
+```
+
+Then, execute the following command from the root of the `go-concourse` repository:
+
+```bash
+go generate ./...
+```
+
+Don't forget to commit the changes made to this repository when committing your other changes.
 
 # Testing
 

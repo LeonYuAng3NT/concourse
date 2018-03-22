@@ -1,6 +1,8 @@
 #!/bin/bash
 # vim: set ft=sh
 
+go install github.com/vito/gosub
+
 gosub list \
   -a github.com/concourse/fly \
   -a github.com/concourse/atc/cmd/... \
@@ -12,9 +14,10 @@ gosub list \
   -t github.com/concourse/topgun/... \
   -t github.com/concourse/atc/... \
   -t github.com/concourse/tsa/... \
-  -t github.com/concourse/groundcrew/... \
+  -t github.com/concourse/skymarshal/... \
+  -t github.com/concourse/web/... \
   -t github.com/concourse/blackbox/integration/... \
   -t github.com/concourse/baggageclaim/integration/... \
   -a github.com/vito/gosub \
   -a github.com/jteeuwen/go-bindata/go-bindata \
-  -a github.com/mattn/goreman
+  -a github.com/mattn/goreman | grep -v code.cloudfoundry.org/guardian

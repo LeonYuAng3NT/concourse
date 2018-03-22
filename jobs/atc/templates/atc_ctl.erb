@@ -13,7 +13,7 @@ set -e
 
 RUN_DIR=/var/vcap/sys/run/atc
 LOG_DIR=/var/vcap/sys/log/atc
-SIGNING_KEY=/var/vcap/packages/generated_signing_key/id_rsa
+SIGNING_KEY=/var/vcap/jobs/atc/config/token_signing_key
 PIDFILE=$RUN_DIR/atc.pid
 CF_CA_CERT=/var/vcap/jobs/atc/config/cf_ca_cert
 POSTGRESQL_CA_CERT=/var/vcap/jobs/atc/config/postgres_ca_cert
@@ -34,21 +34,16 @@ source /var/vcap/packages/pid_utils/pid_utils.sh
     postgres_host, postgres_port = addr.split(":")
   end
 
-  if_p("postgresql.host", "postgresql.port", "postgresql.role.name", "postgresql.role.password", "postgresql.database") do |h, p, rn, rp, db|
-    postgres_host = h
-    postgres_port = p
-    postgres_role_name = rn
-    postgres_role_password = rp
-    postgres_database = db
-  end
+  postgres_host = p("postgresql.host", "")
+  postgres_port = p("postgresql.port")
+  postgres_database = p("postgresql.database")
+  postgres_role_name = p("postgresql.role.name")
+  postgres_role_password = p("postgresql.role.password", "")
 
-  if postgres_host.empty?
-    db = link("db")
-
+  if_link("db") do |db|
     postgres_host = db.instances.first.address
     postgres_port = db.p("bind_port")
     postgres_database = p("postgresql_database")
-    postgres_sslmode = p("postgresql.sslmode", "disable")
 
     postgres_db = db.p("databases").find { |db| db["name"] == postgres_database }
     if postgres_db.nil?
@@ -57,7 +52,17 @@ source /var/vcap/packages/pid_utils/pid_utils.sh
 
     postgres_role_name = postgres_db["role"]
     postgres_role_password = postgres_db["password"]
+  end if postgres_host.empty?
+
+  if_link("postgres") do |l|
+    postgres_host = l.instances.first.address
+  end if postgres_host.empty?
+
+  if postgres_host.empty?
+    raise "postgres.host not set and no 'db' or 'postgres' link available"
   end
+
+  postgres_sslmode = p("postgresql.sslmode", "disable")
 %>
 
 case $1 in
@@ -181,11 +186,14 @@ case $1 in
       --generic-oauth-token-url <%= esc(p("generic_oauth.token_url")) %> \
       --generic-oauth-display-name <%= esc(p("generic_oauth.display_name")) %> \
       --session-signing-key $SIGNING_KEY \
+      <% if_p("intercept_idle_timeout") do |timeout| %> \
+	      --intercept-idle-timeout <%= esc(timeout) %> \
+      <% end %> \
       --resource-checking-interval <%= p("default_check_interval") %> \
-      --old-resource-grace-period <%= p("old_resource_grace_period") %> \
-      --resource-cache-cleanup-interval <%= p("resource_cache_cleanup_interval") %> \
+      --container-placement-strategy <%= p("container_placement_strategy") %> \
       --gc-interval <%= p("gc_interval") %> \
       --build-tracker-interval <%= p("build_tracker_interval") %> \
+      --baggageclaim-response-header-timeout <%= p("baggageclaim_response_header_timeout") %> \
       --cli-artifacts-dir /var/vcap/packages/fly \
       --yeller-api-key <%= esc(p("yeller.api_key")) %> \
       --yeller-environment <%= esc(p("yeller.environment_name")) %> \
@@ -211,14 +219,38 @@ case $1 in
       <% p("riemann.tags").each do |k,v| %> \
       --metrics-attribute <%= esc(k) %>:<%= esc(v) %> \
       <% end %> \
+      <% if_p("prometheus.bind_ip", "prometheus.bind_port") do |ip, port| %> \
+      --prometheus-bind-ip <%= esc(ip) %> \
+      --prometheus-bind-port <%= esc(port) %> \
+      <% end %> \
       --x-frame-options <%= esc(p("x_frame_options")) %> \
+      <% if_p("credhub.url") do |url| %> \
+      --credhub-url <%= esc(url) %> \
+      <% if_p("credhub.tls.ca_cert") do |ca_cert| %> \
+      --credhub-ca-cert /var/vcap/jobs/atc/config/credhub_ca_cert \
+      <% end %> \
+      <% if_p("credhub.tls.client_cert") do %> \
+      --credhub-client-cert /var/vcap/jobs/atc/config/credhub_client_cert \
+      --credhub-client-key /var/vcap/jobs/atc/config/credhub_client_key \
+      <% end %> \
+      <% if p("credhub.tls.insecure_skip_verify") %> \
+      --credhub-insecure-skip-verify \
+      <% end %> \
+      <% if_p("credhub.client_id", "credhub.client_secret") do |id, secret| %> \
+      --credhub-client-id <%= esc(id) %> \
+      --credhub-client-secret <%= esc(secret) %> \
+      <% end %> \
+      --credhub-path-prefix <%= esc(p("credhub.path_prefix")) %> \
+      <% end %> \
       <% if_p("vault.url") do |url| %> \
       --vault-url <%= esc(url) %> \
       <% if_p("vault.tls.ca_cert") do |ca_cert| %> \
       --vault-ca-cert /var/vcap/jobs/atc/config/vault_ca_cert \
       <% end %> \
       --vault-server-name <%= esc(p("vault.tls.server_name")) %> \
-      --vault-insecure-skip-verify <%= p("vault.tls.insecure_skip_verify") %> \
+      <% if p("vault.tls.insecure_skip_verify") %> \
+      --vault-insecure-skip-verify \
+      <% end %> \
       <% if_p("vault.tls.client_cert") do %> \
       --vault-client-cert /var/vcap/jobs/atc/config/vault_client_cert \
       --vault-client-key /var/vcap/jobs/atc/config/vault_client_key \
@@ -228,6 +260,27 @@ case $1 in
       <% p("vault.auth.params").each do |k, v| %> \
       --vault-auth-param <%= esc("#{k}=#{v.to_json}") %> \
       <% end %> \
+      <% if_p("vault.path_prefix") do %> \
+      --vault-path-prefix <%= esc(p("vault.path_prefix")) %> \
+      <% end %> \
+      <% end %> \
+      <% if_p("aws_ssm.region") do |aws_region| %> \
+      --aws-ssm-region <%= esc(aws_region) %> \
+      <% end %> \
+      <% if_p("aws_ssm.access_key") do |aws_access_key| %> \
+      --aws-ssm-access-key <%= esc(aws_access_key) %> \
+      <% end %> \
+      <% if_p("aws_ssm.secret_key") do |aws_secret_key| %> \
+      --aws-ssm-secret-key <%= esc(aws_secret_key) %> \
+      <% end %> \
+      <% if_p("aws_ssm.session_token") do |aws_session_token| %> \
+      --aws-ssm-session-token <%= esc(aws_session_token) %> \
+      <% end %> \
+      <% if_p("aws_ssm.pipeline_secret_template") do |pipeline_secret_template| %> \
+      --aws-ssm-pipeline-secret-template <%= esc(pipeline_secret_template) %> \
+      <% end %> \
+      <% if_p("aws_ssm.team_secret_template") do |team_secret_template| %> \
+      --aws-ssm-team-secret-template <%= esc(team_secret_template) %> \
       <% end %> \
       1>>$LOG_DIR/atc.stdout.log \
       2>>$LOG_DIR/atc.stderr.log
